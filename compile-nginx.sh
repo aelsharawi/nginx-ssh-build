@@ -9,8 +9,8 @@ tar -xzvf 1.7.30.3.tar.gz
 
 cd ~/sources/
 git clone https://github.com/FRiCKLE/ngx_cache_purge.git
-cd ~/sources
 
+cd ~/sources
 wget http://www.openssl.org/source/openssl-1.0.1e.tar.gz
 tar -xzvf openssl-1.0.1e.tar.gz
 cd ~/sources/
