@@ -1,26 +1,36 @@
-mkdir ~/sources/
-cd ~/sources
+# Install dependencies
+# 
+# * checkinstall: package the .deb
+# * libpcre3, libpcre3-dev: required for HTTP rewrite module
+# * zlib1g zlib1g-dbg zlib1g-dev: required for HTTP gzip module
+apt-get install checkinstall libpcre3 libpcre3-dev zlib1g zlib1g-dbg zlib1g-dev && \
 
-wget https://github.com/pagespeed/ngx_pagespeed/archive/v1.7.30.3-beta.zip
-unzip v1.7.30.3-beta.zip
-cd ngx_pagespeed-1.7.30.3-beta
-wget https://dl.google.com/dl/page-speed/psol/1.7.30.3.tar.gz
-tar -xzvf 1.7.30.3.tar.gz
+mkdir ~/sources/ && \
+cd ~/sources && \
 
-cd ~/sources/
-git clone https://github.com/FRiCKLE/ngx_cache_purge.git
+# Compile against OpenSSL to enable NPN
+cd ~/sources && \
+wget http://www.openssl.org/source/openssl-1.0.1e.tar.gz && \
+tar -xzvf openssl-1.0.1e.tar.gz && \
 
-cd ~/sources
-wget http://www.openssl.org/source/openssl-1.0.1e.tar.gz
-tar -xzvf openssl-1.0.1e.tar.gz
-cd ~/sources/
-wget http://nginx.org/download/nginx-1.5.9.tar.gz
-tar zxf nginx-1.5.9.tar.gz
-cd nginx-1.5.9
+# Get the Nginx source.
+#
+# Best to get the latest mainline release. Of course, your mileage may
+# vary depending on future changes
+cd ~/sources/ && \
+wget http://nginx.org/download/nginx-1.5.10.tar.gz && \
+tar zxf nginx-1.5.10.tar.gz && \
+cd nginx-1.5.10 && \
 
-wget http://nginx.org/patches/patch.spdy-v31.txt
-patch -p1 < patch.spdy-v31.txt
-
+# Configure nginx.
+#
+# This is based on the default package in Debian. Additional flags have
+# been added:
+#
+# * --with-debug: adds helpful logs for debugging
+# * --with-openssl=$HOME/sources/openssl-1.0.1e: compile against newer version
+#   of openssl
+# * --with-http_spdy_module: include the SPDY module
 ./configure --prefix=/etc/nginx \
 --sbin-path=/usr/sbin/nginx \
 --conf-path=/etc/nginx/nginx.conf \
@@ -55,10 +65,16 @@ patch -p1 < patch.spdy-v31.txt
 --with-ld-opt='-Wl,-z,relro -Wl,--as-needed' \
 --with-ipv6 \
 --with-debug \
---with-openssl=$HOME/sources/openssl-1.0.1e \
---add-module=$HOME/sources/ngx_pagespeed-1.7.30.3-beta \
---add-module=$HOME/sources/ngx_cache_purge
+--with-openssl=$HOME/sources/openssl-1.0.1e && \
 
-make
-checkinstall --install=no --review-control
-dpkg -i nginx_1.5.9-1_amd64.deb
+# Make the package.
+make && \
+
+# Create a .deb package.
+#
+# Instead of running `make install`, create a .deb and install from there. This
+# allows you to easily uninstall the package if there are issues.
+checkinstall --install=no -y && \
+
+# Install the package.
+dpkg -i nginx_1.5.10-1_amd64.deb
