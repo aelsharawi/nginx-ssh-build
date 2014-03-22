@@ -77,8 +77,8 @@ cd nginx-1.5.12 && \
 --with-ld-opt='-Wl,-z,relro -Wl,--as-needed' \
 --with-ipv6 \
 --with-debug \
---with-openssl=$HOME/sources/openssl-1.0.1e && \
---add-module=$HOME/sources/ngx_pagespeed-1.7.30.4-beta && \
+--with-openssl=$HOME/sources/openssl-1.0.1e \
+--add-module=$HOME/sources/ngx_pagespeed-1.7.30.4-beta \
 --add-module=$HOME/sources/ngx_cache_purge && \
 
 # Make the package.
