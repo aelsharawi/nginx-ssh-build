@@ -5,7 +5,7 @@
 # * zlib1g zlib1g-dbg zlib1g-dev: required for HTTP gzip module
 apt-get install checkinstall libpcre3 libpcre3-dev zlib1g zlib1g-dbg zlib1g-dev && \
 
-mkdir ~/sources/ && \
+mkdir -p ~/sources/ && \
 
 # Compile against OpenSSL to enable NPN
 cd ~/sources && \
