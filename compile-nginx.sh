@@ -6,21 +6,33 @@
 apt-get install checkinstall libpcre3 libpcre3-dev zlib1g zlib1g-dbg zlib1g-dev && \
 
 mkdir ~/sources/ && \
-cd ~/sources && \
 
 # Compile against OpenSSL to enable NPN
 cd ~/sources && \
 wget http://www.openssl.org/source/openssl-1.0.1e.tar.gz && \
 tar -xzvf openssl-1.0.1e.tar.gz && \
 
+# Download the Cache Purge module
+cd ~/sources/ && \
+git clone https://github.com/FRiCKLE/ngx_cache_purge.git && \
+cd ~/sources && \
+
+# Download PageSpeed
+cd ~/sources && \
+wget https://github.com/pagespeed/ngx_pagespeed/archive/v1.7.30.4-beta.zip && \
+unzip v1.7.30.4-beta.zip && \
+cd ngx_pagespeed-1.7.30.4-beta && \
+wget https://dl.google.com/dl/page-speed/psol/1.7.30.4.tar.gz && \
+tar -xzvf 1.7.30.4.tar.gz && \
+
 # Get the Nginx source.
 #
 # Best to get the latest mainline release. Of course, your mileage may
 # vary depending on future changes
 cd ~/sources/ && \
-wget http://nginx.org/download/nginx-1.5.10.tar.gz && \
-tar zxf nginx-1.5.10.tar.gz && \
-cd nginx-1.5.10 && \
+wget http://nginx.org/download/nginx-1.5.12.tar.gz && \
+tar zxf nginx-1.5.12.tar.gz && \
+cd nginx-1.5.12 && \
 
 # Configure nginx.
 #
@@ -66,6 +78,8 @@ cd nginx-1.5.10 && \
 --with-ipv6 \
 --with-debug \
 --with-openssl=$HOME/sources/openssl-1.0.1e && \
+--add-module=$HOME/sources/ngx_pagespeed-1.7.30.4-beta && \
+--add-module=$HOME/sources/ngx_cache_purge && \
 
 # Make the package.
 make && \
@@ -77,4 +91,4 @@ make && \
 checkinstall --install=no -y && \
 
 # Install the package.
-dpkg -i nginx_1.5.10-1_amd64.deb
+dpkg -i nginx_1.5.12-1_amd64.deb
