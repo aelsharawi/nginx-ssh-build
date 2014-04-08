@@ -9,8 +9,8 @@ mkdir -p ~/sources/ && \
 
 # Compile against OpenSSL to enable NPN
 cd ~/sources && \
-wget http://www.openssl.org/source/openssl-1.0.1e.tar.gz && \
-tar -xzvf openssl-1.0.1e.tar.gz && \
+wget http://www.openssl.org/source/openssl-1.0.1g.tar.gz && \
+tar -xzvf openssl-1.0.1g.tar.gz && \
 
 # Download the Cache Purge module
 cd ~/sources/ && \
@@ -77,7 +77,7 @@ cd nginx-1.5.12 && \
 --with-ld-opt='-Wl,-z,relro -Wl,--as-needed' \
 --with-ipv6 \
 --with-debug \
---with-openssl=$HOME/sources/openssl-1.0.1e \
+--with-openssl=$HOME/sources/openssl-1.0.1g \
 --add-module=$HOME/sources/ngx_pagespeed-1.7.30.4-beta \
 --add-module=$HOME/sources/ngx_cache_purge && \
 
