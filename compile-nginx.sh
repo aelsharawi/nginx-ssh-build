@@ -5,34 +5,41 @@
 # * zlib1g zlib1g-dbg zlib1g-dev: required for HTTP gzip module
 apt-get install checkinstall libpcre3 libpcre3-dev zlib1g zlib1g-dbg zlib1g-dev && \
 
-mkdir -p ~/sources/ && \
+OLD_DIR=`pwd` && \
+WDIR=~/sources/ && \
+OPENSSL_VER=1.0.1h && \
+PAGESPEED_VER=1.8.31.4 && \
+NGINX_VER=1.7.2 && \
+
+mkdir -p $WDIR && \
+cd $WDIR && \
 
 # Compile against OpenSSL to enable NPN
-cd ~/sources && \
-wget http://www.openssl.org/source/openssl-1.0.1g.tar.gz && \
-tar -xzvf openssl-1.0.1g.tar.gz && \
+wget http://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz && \
+tar -xzvf openssl-${OPENSSL_VER}.tar.gz && \
 
 # Download the Cache Purge module
-cd ~/sources/ && \
 git clone https://github.com/FRiCKLE/ngx_cache_purge.git && \
-cd ~/sources && \
+
+# Download the Nginx HTTP Auth Digest
+# Use a patched fork because the real one compile with a warning and -Werror doesn't like that
+git clone https://github.com/maneulyori/nginx-http-auth-digest.git && \
 
 # Download PageSpeed
-cd ~/sources && \
-wget https://github.com/pagespeed/ngx_pagespeed/archive/v1.7.30.4-beta.zip && \
-unzip v1.7.30.4-beta.zip && \
-cd ngx_pagespeed-1.7.30.4-beta && \
-wget https://dl.google.com/dl/page-speed/psol/1.7.30.4.tar.gz && \
-tar -xzvf 1.7.30.4.tar.gz && \
+wget https://github.com/pagespeed/ngx_pagespeed/archive/v${PAGESPEED_VER}-beta.zip && \
+unzip v${PAGESPEED_VER}-beta.zip && \
+cd ngx_pagespeed-${PAGESPEED_VER}-beta && \
+wget https://dl.google.com/dl/page-speed/psol/${PAGESPEED_VER}.tar.gz && \
+tar -xzvf ${PAGESPEED_VER}.tar.gz && \
+cd $WDIR && \
 
 # Get the Nginx source.
 #
 # Best to get the latest mainline release. Of course, your mileage may
 # vary depending on future changes
-cd ~/sources/ && \
-wget http://nginx.org/download/nginx-1.5.12.tar.gz && \
-tar zxf nginx-1.5.12.tar.gz && \
-cd nginx-1.5.12 && \
+wget http://nginx.org/download/nginx-${NGINX_VER}.tar.gz && \
+tar zxf nginx-${NGINX_VER}.tar.gz && \
+cd nginx-$NGINX_VER && \
 
 # Configure nginx.
 #
@@ -40,7 +47,7 @@ cd nginx-1.5.12 && \
 # been added:
 #
 # * --with-debug: adds helpful logs for debugging
-# * --with-openssl=$HOME/sources/openssl-1.0.1e: compile against newer version
+# * --with-openssl=$WDIR/openssl-$OPENSSL_VER: compile against newer version
 #   of openssl
 # * --with-http_spdy_module: include the SPDY module
 ./configure --prefix=/etc/nginx \
@@ -77,9 +84,10 @@ cd nginx-1.5.12 && \
 --with-ld-opt='-Wl,-z,relro -Wl,--as-needed' \
 --with-ipv6 \
 --with-debug \
---with-openssl=$HOME/sources/openssl-1.0.1g \
---add-module=$HOME/sources/ngx_pagespeed-1.7.30.4-beta \
---add-module=$HOME/sources/ngx_cache_purge && \
+--with-openssl=$WDIR/openssl-$OPENSSL_VER \
+--add-module=$WDIR/ngx_pagespeed-${PAGESPEED_VER}-beta \
+--add-module=$WDIR/nginx-http-auth-digest \
+--add-module=$WDIR/ngx_cache_purge && \
 
 # Make the package.
 make && \
@@ -91,4 +99,10 @@ make && \
 checkinstall --install=no -y && \
 
 # Install the package.
-dpkg -i nginx_1.5.12-1_amd64.deb
+dpkg -i nginx_${NGINX_VER}-1_amd64.deb && \
+
+# Restore old directory.
+cd $OLD_DIR && \
+
+# Remove downloaded sources.
+rm -rf $WDIR
