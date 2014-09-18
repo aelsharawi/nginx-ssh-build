@@ -1,3 +1,14 @@
+########################################
+#
+# Todo:
+#
+# - add headers-more-nginx-module
+# - add naxsi
+# - update everything to latest versions
+#
+########################################
+
+
 # Install dependencies
 # 
 # * checkinstall: package the .deb
