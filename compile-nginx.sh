@@ -18,9 +18,9 @@ apt-get install checkinstall libpcre3 libpcre3-dev zlib1g zlib1g-dbg zlib1g-dev 
 
 OLD_DIR=`pwd` && \
 WDIR=~/sources/ && \
-OPENSSL_VER=1.0.1h && \
-PAGESPEED_VER=1.8.31.4 && \
-NGINX_VER=1.7.2 && \
+OPENSSL_VER=1.0.2h && \
+PAGESPEED_VER=1.11.33.0 && \
+NGINX_VER=1.10.0 && \
 
 mkdir -p $WDIR && \
 cd $WDIR && \
@@ -29,8 +29,20 @@ cd $WDIR && \
 wget http://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz && \
 tar -xzvf openssl-${OPENSSL_VER}.tar.gz && \
 
+# module ngx_brotli
+
+git clone https://github.com/google/ngx_brotli.git  && \
+
+
 # Download the Cache Purge module
 git clone https://github.com/FRiCKLE/ngx_cache_purge.git && \
+
+# Download the Nginx HTTP Auth Digest
+# Use a patched fork because the real one compile with a warning and -Werror doesn't like that
+git clone https://github.com/openresty/headers-more-nginx-module.git && \
+
+
+
 
 # Download the Nginx HTTP Auth Digest
 # Use a patched fork because the real one compile with a warning and -Werror doesn't like that
@@ -90,7 +102,7 @@ cd nginx-$NGINX_VER && \
 --with-mail \
 --with-mail_ssl_module \
 --with-file-aio \
---with-http_spdy_module \
+--with-http_v2_module  \
 --with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
 --with-ld-opt='-Wl,-z,relro -Wl,--as-needed' \
 --with-ipv6 \
@@ -99,6 +111,9 @@ cd nginx-$NGINX_VER && \
 --add-module=$WDIR/ngx_pagespeed-${PAGESPEED_VER}-beta \
 --add-module=$WDIR/nginx-http-auth-digest \
 --add-module=$WDIR/ngx_cache_purge && \
+--add-module=$WDIR/ngx_brotli && \
+--add-module=$WDIR/headers-more-nginx-module && \
+
 
 # Make the package.
 make && \
